@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { PDFDocument, rgb } from 'pdf-lib';
 import InputMask from 'react-input-mask';
-import './DclForm.css'; 
+import './DclForm.css';
 
 const DclForm = () => {
+    const [numeroDcl, setNumeroDcl] = useState('');
     const [remetente, setRemetente] = useState('');
     const [cnpjRemetente, setCnpjRemetente] = useState('');
     const [cidadeRemetente, setCidadeRemetente] = useState('');
@@ -20,8 +21,9 @@ const DclForm = () => {
     const [bairroDestinatario, setBairroDestinatario] = useState('Campestre');
     const [cepDestinatario, setCepDestinatario] = useState('09080570');
     const [contatoDestinatario, setContatoDestinatario] = useState('3232269382');
-    const [itens, setItens] = useState([{ quantidade: '', descricao: '', codigoProduto: '', valorUnitario: '', valorTotal: '' }]);
+    const [itens, setItens] = useState([{ quantidade: '', descricao: '', codigoProduto: '', peso: '' }]);
     const [valorSimbolico, setValorSimbolico] = useState('');
+    const [tipoRemetente, setTipoRemetente] = useState('fisica'); // 'fisica' ou 'juridica'
 
     const fetchCepData = async (cep) => {
         try {
@@ -107,11 +109,12 @@ const DclForm = () => {
         const fontSize = 12;
         let yPosition = 740; 
 
-        // Carregar fontes
         const fontRegular = await pdfDoc.embedFont('Helvetica');
         const fontBold = await pdfDoc.embedFont('Helvetica-Bold');
 
-        // Cabeçalho
+        page.drawText(`Nº da DCL: ${numeroDcl}`, { x: 430, y: yPosition, size: fontSize, font: fontRegular });
+        yPosition += 30;
+
         drawCenteredText(page, 'DECLARAÇÃO PARA TRANSPORTE DE MERCADORIA', yPosition, 18, { regular: fontBold, bold: fontBold });
         yPosition -= 30;
         drawCenteredText(page, 'AnyGrid', yPosition, 20, { regular: fontBold, bold: fontBold });
@@ -155,7 +158,6 @@ const DclForm = () => {
         page.drawRectangle({ x: 50, y: yPosition, width: 500, height: 140, borderColor: rgb(0, 0, 0), borderWidth: 1 });
         yPosition -= 20;
 
-        // Texto da declaração
         const declarationText = [
             'Declaramos para os devidos fins, e sob as penas da lei, que nesta data estamos transportando pela AIRSUPPLY LOGISTICA E TRANSPORTES LTDA.',
             'os bens para transporte ao destinatário acima qualificado, devidamente embalados e identificados.',
@@ -173,12 +175,9 @@ const DclForm = () => {
             yPosition -= 10;
         }
 
-        // Tabela de itens
-        const xPosition = 40; // Posição inicial em X
-
         // Desenhar o texto "Itens"
-        page.drawText('Itens', { x:60, xPosition, y: yPosition, size: fontSize, font: fontBold });
-        yPosition -= 20; // Atualiza a posição Y para o próximo elemento
+        page.drawText('Itens', { x: 60, y: yPosition, size: fontSize, font: fontBold });
+        yPosition -= 20; 
 
         // Cabeçalho da tabela de itens
         const headers = ['Quantidade', 'Descrição', 'Código Produto', 'Peso'];
@@ -191,11 +190,11 @@ const DclForm = () => {
 
         // Desenhar linhas da tabela de itens
         itens.forEach(item => {
-            if (item.quantidade && item.descricao && item.codigoProduto && item.valorTotal) {
-                page.drawText(item.quantidade, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
-                page.drawText(item.descricao, { x: 180, y: yPosition, size: fontSize, font: fontRegular });
-                page.drawText(item.codigoProduto, { x: 320, y: yPosition, size: fontSize, font: fontRegular });
-                page.drawText(item.peso, { x: 450, y: yPosition, size: fontSize, font: fontRegular });
+            if (item.quantidade && item.descricao && item.codigoProduto && item.peso) {
+                page.drawText(item.quantidade, { x: 60, y: yPosition, size: fontSize, font: fontBold });
+                page.drawText(item.descricao, { x: 180, y: yPosition, size: fontSize, font: fontBold });
+                page.drawText(item.codigoProduto, { x: 320, y: yPosition, size: fontSize, font: fontBold });
+                page.drawText(item.peso, { x: 450, y: yPosition, size: fontSize, font: fontBold });
                 yPosition -= 30;
             }
         });
@@ -203,7 +202,6 @@ const DclForm = () => {
         // Valor Simbólico
         drawCenteredText(page, `VALOR SIMBÓLICO: ${valorSimbolico}`, yPosition, fontSize, { regular: fontBold, bold: fontBold });
         yPosition -= 40;
-        
 
         // Assinatura
         drawCenteredText(page, 'Assinatura do Responsável:', yPosition, fontSize, { regular: fontRegular, bold: fontBold });
@@ -227,10 +225,32 @@ const DclForm = () => {
     return (
         <div className="form-container">
             <h1>DCL AnyGrid</h1>
+            <div className="input-dcl">
+                <input 
+                    type="text" 
+                    placeholder="Número da DCL" 
+                    value={numeroDcl} 
+                    onChange={(e) => setNumeroDcl(e.target.value)} 
+                />
+            </div>
             <div className="section">
-                <h2>Remetente</h2>
+                <h2>
+                    Remetente: 
+                    <button 
+                        onClick={() => setTipoRemetente(tipoRemetente === 'fisica' ? 'juridica' : 'fisica')}
+                        style={{ marginLeft: '10px', padding: '5px 10px',height:'30px' }}
+                    >
+                        {tipoRemetente === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica'}
+                    </button>
+                </h2>
                 <input type="text" placeholder="Nome" value={remetente} onChange={(e) => setRemetente(e.target.value)} />
-                <InputMask mask="999.999.999-99" maskChar={null} placeholder="CPF" value={cnpjRemetente} onChange={(e) => setCnpjRemetente(e.target.value)} />
+                <InputMask 
+                    mask={tipoRemetente === 'fisica' ? "999.999.999-99" : "99.999.999/9999-99"} 
+                    maskChar={null} 
+                    placeholder={tipoRemetente === 'fisica' ? "CPF" : "CNPJ"} 
+                    value={cnpjRemetente} 
+                    onChange={(e) => setCnpjRemetente(e.target.value)} 
+                />
                 <input type="text" placeholder="Cidade" value={cidadeRemetente} onChange={(e) => setCidadeRemetente(e.target.value)} />
                 <input type="text" placeholder="UF" value={ufRemetente} onChange={(e) => setUfRemetente(e.target.value)} />
                 <input type="text" placeholder="Endereço" value={enderecoRemetente} onChange={(e) => setEnderecoRemetente(e.target.value)} />
@@ -265,26 +285,42 @@ const DclForm = () => {
                             <InputMask mask="999" maskChar={null} placeholder="Quantidade" value={item.quantidade} onChange={(e) => handleItemChange(index, 'quantidade', e.target.value)} />
                             <input type="text" placeholder="Descrição" value={item.descricao} onChange={(e) => handleItemChange(index, 'descricao', e.target.value)} />
                             <input type="text" placeholder="Código Produto" value={item.codigoProduto} onChange={(e) => handleItemChange(index, 'codigoProduto', e.target.value)} />
-                            <InputMask mask="999,99 KG" maskChar={null} placeholder="Peso" value={item.peso} onChange={(e) => handleItemChange(index, 'Peso', e.target.value)} />
+                            <InputMask mask="999,99 KG" maskChar={null} placeholder="Peso" value={item.peso} onChange={(e) => handleItemChange(index, 'peso', e.target.value)} />
                             <button
-                            type="button"style={{ backgroundColor: 'red',color: 'white',border: 'none', padding: '8px 12px',  cursor: 'pointer', borderRadius: '4px',fontWeight: 'bold',
-                            }}
-                            onClick={() => removeItem(index)}
-                        >
-                            Remover
-                        </button>
-                        </div>
+                                type="button"
+                                style={{ backgroundColor: 'red', color: 'white', border: 'none', padding: '8px 12px', cursor: 'pointer', borderRadius: '4px', fontWeight: 'bold' }}
+                                onClick={() => removeItem(index)}
+                            >
+                                Remover
+                            </button>
+                            </div>
                     ))}
                 </div>
-                <button type="button" onClick={addItem}>Adicionar Item</button>
+                <button 
+                    type="button" 
+                    style={{ marginTop: '-10px', padding: '10px 15px' }} 
+                    onClick={addItem}
+                >
+                    Adicionar Item
+                </button>
             </div>
-
+            
             <div className="section">
                 <h2>Valor Simbólico</h2>
-                <InputMask mask="R$ 9999,99" maskChar={null} placeholder="Valor Simbólico" value={valorSimbolico} onChange={(e) => setValorSimbolico(e.target.value)} />
-                <button onClick={generatePdf}>Gerar DCL</button>
+                <input 
+                    type="text" 
+                    placeholder="Valor Simbólico" 
+                    value={valorSimbolico} 
+                    onChange={(e) => setValorSimbolico(e.target.value)} 
+                />
             </div>
-                
+
+            <button 
+                style={{ marginTop: '-6px', padding: '10px 15px' }} 
+                onClick={generatePdf}
+            >
+                Gerar PDF
+            </button>
         </div>
     );
 };
