@@ -425,6 +425,7 @@ const DclForm = () => {
         onClick={generatePdf}
       >
         Gerar PDF
+        
       </button>
     </div>
   );
