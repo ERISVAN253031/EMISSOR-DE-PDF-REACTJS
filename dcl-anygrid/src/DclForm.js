@@ -129,17 +129,17 @@ const DclForm = () => {
     // Remetente
     page.drawText("Remetente:", { x: 60, y: yPosition, size: fontSize, font: fontBold });
     yPosition -= 15;
-    page.drawText(`Nome: ${remetente || "N/A"}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
+    page.drawText(`Nome: ${remetente || ""}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
     yPosition -= 15;
-    page.drawText(`CPF/CNPJ: ${cnpjRemetente || "N/A"}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
+    page.drawText(`CPF/CNPJ: ${cnpjRemetente || ""}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
     yPosition -= 15;
-    page.drawText(`Cidade: ${cidadeRemetente || "N/A"}  UF: ${ufRemetente || "N/A"}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
+    page.drawText(`Cidade: ${cidadeRemetente || ""}  UF: ${ufRemetente || ""}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
     yPosition -= 15;
-    page.drawText(`Endereço: ${enderecoRemetente || "N/A"}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
+    page.drawText(`Endereço: ${enderecoRemetente || ""}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
     yPosition -= 15;
-    page.drawText(`Bairro: ${bairroRemetente || "N/A"}  CEP: ${cepRemetente || "N/A"}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
+    page.drawText(`Bairro: ${bairroRemetente || ""}  CEP: ${cepRemetente || ""}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
     yPosition -= 15;
-    page.drawText(`Contato: ${contatoRemetente || "N/A"}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
+    page.drawText(`Contato: ${contatoRemetente || ""}`, { x: 60, y: yPosition, size: fontSize, font: fontRegular });
     yPosition -= 20;
 
     page.drawRectangle({ x: 50, y: yPosition, width: 500, height: 140, borderColor: rgb(0, 0, 0), borderWidth: 1 });
